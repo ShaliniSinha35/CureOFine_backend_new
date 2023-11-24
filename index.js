@@ -16,10 +16,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static("public"));
 
 const connection = mysql.createConnection({
+
   host: "localhost",
-  user: "root",
-  password: "",
-  database: "cureofine",
+  user: "mclinpll_cureofine",
+  password: "BRLN,GC4*WXT",
+  database: "mclinpll_cureofine_db",
+  // host: "localhost",
+  // user: "root",
+  // password: "",
+  // database: "cureofine",
 });
 
 connection.connect((err) => {
