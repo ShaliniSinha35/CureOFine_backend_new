@@ -3,24 +3,25 @@ const mysql = require("mysql");
 const app = express();
 const port = process.env.port || 3000;
 const bodyParser = require("body-parser");
-const accountSid = "ACb5372861a5287c06e6b0b9119fad7621";
-const authToken = "c6e6762c6d7ec95553f9603006c1d67b";
 const storage = require("node-persist");
-const cors= require('cors');
+const cors = require('cors');
+const accountSid = "ACb5372861a5287c06e6b0b9119fad7621";
+const authToken = "6da6caa5a6d403ab5c775891957224a4";
+
+
+
 app.use(cors())
-
-
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static("public"));
 
 const connection = mysql.createConnection({
 
-  host: "localhost",
+  host: "119.18.54.135",
   user: "mclinpll_cureofine",
   password: "BRLN,GC4*WXT",
   database: "mclinpll_cureofine_db",
+
   // host: "localhost",
   // user: "root",
   // password: "",
@@ -131,7 +132,7 @@ app.post("/enquiry", (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  const phoneNumber =req.body.phone;
+  const phoneNumber = req.body.phone;
 
   const otp = Math.floor(100000 + Math.random() * 900000);
 
@@ -141,8 +142,8 @@ app.post("/signup", async (req, res) => {
     from: +16178418324,
     body: `Your OTP is: ${otp}`,
   })
-  .then(()=>res.json({ message: "Valid Number"}))
-  .catch(()=>res.json({message: "Invalid Number"}))
+    .then(() => res.json({ message: "Valid Number" }))
+    .catch(() => res.json({ message: "Invalid Number" }))
 
   const user = { phoneNumber, otp };
   console.log(user);
@@ -150,10 +151,12 @@ app.post("/signup", async (req, res) => {
   await storage.init();
   await storage.setItem("user", user);
 
-  
+
   console.log("otp sent successfully")
 
 });
+
+
 
 
 app.post("/verify", async (req, res) => {
@@ -170,7 +173,7 @@ app.post("/verify", async (req, res) => {
   if (otp == user.otp) {
     console.log("otp verification successful");
 
-    var sql = "INSERT INTO signup (phone, otp, entry_time) VALUES (?, ?, NOW())";
+    var sql = "INSERT INTO web_user( mobile, otp_details, cdate ) VALUES (?, ?, NOW())";
     connection.query(sql, [user.phoneNumber, user.otp], (err, result) => {
       if (err) {
         console.error("Error inserting data into the database:", err);
@@ -178,7 +181,7 @@ app.post("/verify", async (req, res) => {
       } else {
         console.log("User registered successfully");
         res.json({ message: "OTP verification successful" });
-          storage.clear();
+        storage.clear();
       }
     });
   } else {
@@ -192,6 +195,9 @@ app.post("/verify", async (req, res) => {
 
 
 
+
+
+
 app.get("/presence", (req, res) => {
   connection.query(
     "SELECT * FROM `our_presence`;",
@@ -200,7 +206,7 @@ app.get("/presence", (req, res) => {
         console.log(error);
       } else {
         // console.log(results)
-       return res.json(results);
+        return res.json(results);
       }
     }
   );
@@ -322,6 +328,21 @@ app.get("/staticText", (req, res) => {
 app.get("/contactInfo", (req, res) => {
   connection.query(
     "SELECT  `email`,  `mobile_2`, `office_hour` FROM `website_data`",
+    (error, results) => {
+      if (error) {
+        console.log(error);
+      } else {
+        res.json(results);
+      }
+    }
+  );
+});
+
+
+
+app.get("/hospitals", (req, res) => {
+  connection.query(
+    "SELECT `id`, `name`, `mobile`, `address`, `htype`, `image` FROM `manage_hospital`",
     (error, results) => {
       if (error) {
         console.log(error);
